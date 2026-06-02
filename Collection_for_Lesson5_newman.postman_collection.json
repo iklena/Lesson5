@@ -1,0 +1,1592 @@
+{
+  "info": {
+    "_postman_id": "31d29d3c-6234-4829-92b9-8965cc3e9bc0",
+    "name": "Collection for Lesson 5",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55147410",
+    "_collection_link": "https://go.postman.co/collection/55147410-31d29d3c-6234-4829-92b9-8965cc3e9bc0?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create List",
+      "item": [
+        {
+          "name": "Create a list with a random name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code for List creation is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "var body = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"List has the correct name\", function () {\r",
+                  "    pm.expect(body.name).to.eql(\"tst_\" + pm.collectionVariables.get(\"rndNum\"));\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Check schema\r",
+                  "\r",
+                  "const Ajv = require('ajv');\r",
+                  "const ajv = new Ajv();\r",
+                  "\r",
+                  "var schema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"id\", \"name\", \"deleted\", \"orderindex\", \"content\", \"task_count\", \"archived\", \"override_statuses\", \"statuses\", \"permission_level\", \"folder\", \"space\", \"inbound_address\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"id\": { \"type\": \"string\" },\r",
+                  "        \"name\": { \"type\": \"string\" },\r",
+                  "        \"deleted\": { \"type\": \"boolean\" },\r",
+                  "        \"orderindex\": { \"type\": \"number\" },\r",
+                  "        \"content\": { \"type\": \"string\" },\r",
+                  "        \"priority\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"assignee\": { \"type\": [\"string\", \"object\", \"null\"] },\r",
+                  "        \"task_count\": { \"type\": \"number\" },\r",
+                  "        \"due_date\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"start_date\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"folder\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"hidden\", \"archived\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"hidden\": { \"type\": \"boolean\" },\r",
+                  "                \"archived\": { \"type\": \"boolean\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"space\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"archived\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"archived\": { \"type\": \"boolean\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"inbound_address\": { \"type\": \"string\" },\r",
+                  "        \"archived\": { \"type\": \"boolean\" },\r",
+                  "        \"override_statuses\": { \"type\": \"boolean\" },\r",
+                  "        \"statuses\": {\r",
+                  "            \"type\": \"array\",\r",
+                  "            \"items\": {\r",
+                  "                \"type\": \"object\",\r",
+                  "                \"required\": [\"id\", \"status\", \"orderindex\", \"color\", \"type\", \"status_group\"],\r",
+                  "                \"properties\": {\r",
+                  "                    \"id\": { \"type\": \"string\" },\r",
+                  "                    \"status\": { \"type\": \"string\" },\r",
+                  "                    \"orderindex\": { \"type\": \"number\" },\r",
+                  "                    \"color\": { \"type\": \"string\" },\r",
+                  "                    \"type\": { \"type\": \"string\" },\r",
+                  "                    \"status_group\": { \"type\": \"string\" }\r",
+                  "                }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"permission_level\": { \"type\": \"string\" }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "const validate = ajv.compile(schema);\r",
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Schema is valid', function () {\r",
+                  "    const valid = validate(response);\r",
+                  "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "/*\r",
+                  "pm.test('Schema is valid', function () {\r",
+                  "    pm.expect(tv4.validate(body, schema)).to.be.true;\r",
+                  "});\r",
+                  "*/\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\")\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"list_id\");\r",
+                  "\r",
+                  "var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "pm.collectionVariables.set(\"rndNum\", rndNum);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"tst_{{rndNum}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{app_url}}/folder/{{folder_id}}/list",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "folder",
+                "{{folder_id}}",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a list with non-unique name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code for List Creation is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "var body1 = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"List name is not unique\", function () {\r",
+                  "    pm.expect(body1.err).to.eql(\"List name taken\");\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "var env = pm.environment.get(\"app_url\");\r",
+                  "var listId = pm.collectionVariables.get(\"list_id\");\r",
+                  "var token_auth = pm.environment.get(\"token\");\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: env + \"/list/\" + listId,\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": token_auth\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: env + \"/list/\" + listId,\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"list_id\");\r",
+                  "pm.collectionVariables.unset(\"list_name_non_uniq\");\r",
+                  "\r",
+                  "var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({ name: \"tst_\" + rndNum })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "    pm.collectionVariables.set(\"list_name_non_uniq\", body.name);\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "    \r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "    pm.collectionVariables.set(\"list_name_non_uniq\", body.name);\r",
+                  "      \r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"{{list_name_non_uniq}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{app_url}}/folder/{{folder_id}}/list",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "folder",
+                "{{folder_id}}",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Delete List",
+      "item": [
+        {
+          "name": "Delete the created list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code for Delete is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"list_id1\");\r",
+                  "\r",
+                  "var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({ name: \"tst_\" + rndNum })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id1\", body.id);\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "    \r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id1\", body.id);\r",
+                  "      \r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "\r",
+                  "*/"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{app_url}}/list/{{list_id1}}",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "list",
+                "{{list_id1}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Get Lists",
+      "item": [
+        {
+          "name": "Get lists of a folder",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "var body = pm.response.json();\r",
+                  "var length = body.lists.length;\r",
+                  "\r",
+                  "pm.test(\"List has the correct ID\", function () {\r",
+                  "    pm.expect(body.lists[length - 1].id).to.eql(pm.collectionVariables.get(\"list_id\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"List contains the correct Folder ID\", function () {\r",
+                  "    pm.expect(body.lists[length - 1].folder.id).to.eql(pm.environment.get(\"folder_id\"));\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Check schema\r",
+                  "\r",
+                  "const Ajv = require('ajv');\r",
+                  "const ajv = new Ajv();\r",
+                  "\r",
+                  "var schema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"lists\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"lists\": {\r",
+                  "            \"type\": \"array\",\r",
+                  "            \"items\": {\r",
+                  "                \"type\": \"object\",\r",
+                  "                \"required\": [\"id\", \"name\", \"folder\", \"space\", \"archived\", \"permission_level\"],\r",
+                  "                \"properties\": {\r",
+                  "                    \"id\": { \"type\": \"string\" },\r",
+                  "                    \"name\": { \"type\": \"string\" },\r",
+                  "                    \"orderindex\": { \"type\": \"number\" },\r",
+                  "                    \"content\": { \"type\": \"string\" },\r",
+                  "                    \"status\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"object\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"priority\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"object\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"assignee\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"object\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"task_count\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"number\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"due_date\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"string\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"start_date\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"string\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"folder\": {\r",
+                  "                        \"type\": \"object\",\r",
+                  "                        \"required\": [\"id\"],\r",
+                  "                        \"properties\": {\r",
+                  "                            \"id\": { \"type\": \"string\" },\r",
+                  "                            \"name\": { \"type\": \"string\" },\r",
+                  "                            \"hidden\": { \"type\": \"boolean\" },\r",
+                  "                            \"access\": { \"type\": \"boolean\" }\r",
+                  "                        }\r",
+                  "                    },\r",
+                  "                    \"space\": {\r",
+                  "                        \"type\": \"object\",\r",
+                  "                        \"required\": [\"id\"],\r",
+                  "                        \"properties\": {\r",
+                  "                            \"id\": { \"type\": \"string\" },\r",
+                  "                            \"name\": { \"type\": \"string\" },\r",
+                  "                            \"access\": { \"type\": \"boolean\" }\r",
+                  "                        }\r",
+                  "                    },\r",
+                  "                    \"archived\": { \"type\": \"boolean\" },\r",
+                  "                    \"override_statuses\": {\r",
+                  "                        \"oneOf\": [\r",
+                  "                            { \"type\": \"boolean\" },\r",
+                  "                            { \"type\": \"null\" }\r",
+                  "                        ]\r",
+                  "                    },\r",
+                  "                    \"statuses\": { \"type\": \"array\" },\r",
+                  "                    \"permission_level\": { \"type\": \"string\" }\r",
+                  "                }\r",
+                  "            }\r",
+                  "        }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "const validate = ajv.compile(schema);\r",
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Schema is valid', function () {\r",
+                  "    const valid = validate(response);\r",
+                  "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  "// Display a list of all IDs and Delete all lists in the folder\r",
+                  "\r",
+                  "body.lists.forEach(async (list) => {\r",
+                  "    console.log(list.id);\r",
+                  "    // console.log(list.name);\r",
+                  "    try {\r",
+                  "        const response = await pm.sendRequest({\r",
+                  "            url: pm.environment.get(\"app_url\") + \"/list/\" + list.id,\r",
+                  "            method: \"DELETE\",\r",
+                  "            header: {\r",
+                  "                \"Authorization\": pm.environment.get(\"token\")\r",
+                  "            }\r",
+                  "        });\r",
+                  "\r",
+                  "    } catch (err) {\r",
+                  "        console.error(err);\r",
+                  "    }\r",
+                  "})\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"list_id\");\r",
+                  "\r",
+                  "\r",
+                  "for (var i = 1, j = 2; i <= j; i++) {\r",
+                  "    var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({ name: \"tst_\" + rndNum })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "    \r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "    try {\r",
+                  "        const response = await pm.sendRequest({\r",
+                  "            url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "            method: \"POST\",\r",
+                  "            header: {\r",
+                  "                \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "                \"Content-Type\": \"application/json\",\r",
+                  "                \"accept\": \"application/json\"\r",
+                  "            },\r",
+                  "            body: {\r",
+                  "                mode: \"raw\",\r",
+                  "                raw: JSON.stringify({\r",
+                  "                    name: \"tst_\" + rndNum\r",
+                  "                })\r",
+                  "            }\r",
+                  "        });\r",
+                  "        var body = response.json();\r",
+                  "        pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "       \r",
+                  "       \r",
+                  "        // console.log(\"i = \", i);\r",
+                  "        // console.log(\"List ID = \", body.id);\r",
+                  "        // console.log(body.name); \r",
+                  "        \r",
+                  "\r",
+                  "    } catch (err) {\r",
+                  "        console.error(err);\r",
+                  "    } \r",
+                  "*/\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{app_url}}/folder/{{folder_id}}/list",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "folder",
+                "{{folder_id}}",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Get List Info",
+      "item": [
+        {
+          "name": "Get a list info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "var body = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"List contains correct ID\", function () {\r",
+                  "    pm.expect(body.id).to.eql(pm.collectionVariables.get(\"list_id\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"List contains correct folder ID\", function () {\r",
+                  "    pm.expect(body.folder.id).to.eql(pm.environment.get(\"folder_id\"));\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Check schema\r",
+                  "/*\r",
+                  "const Ajv = require('ajv');\r",
+                  "const ajv = new Ajv();\r",
+                  "\r",
+                  "var schema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"id\", \"name\", \"folder\", \"space\", \"archived\", \"permission_level\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"id\": { \"type\": \"string\" },\r",
+                  "        \"name\": { \"type\": \"string\" },\r",
+                  "        \"orderindex\": { \"type\": \"integer\" },\r",
+                  "        \"content\": { \"type\": \"string\" },\r",
+                  "        \"status\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"properties\": {\r",
+                  "                \"status\": { \"type\": \"string\" },\r",
+                  "                \"color\": { \"type\": \"string\" },\r",
+                  "                \"hide_label\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"priority\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"properties\": {\r",
+                  "                \"priority\": { \"type\": \"string\" },\r",
+                  "                \"color\": { \"type\": \"string\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"assignee\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"task_count\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"due_date\": { \"type\": \"string\" },\r",
+                  "        \"due_date_time\": { \"type\": \"boolean\" },\r",
+                  "        \"start_date\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"start_date_time\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"folder\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"hidden\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"hidden\": { \"type\": \"boolean\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"space\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"inbound_address\": { \"type\": \"string\" },\r",
+                  "        \"archived\": { \"type\": \"boolean\" },\r",
+                  "        \"override_statuses\": { \"type\": [\"boolean\", \"null\"] },\r",
+                  "        \"statuses\": { \"type\": \"array\" },\r",
+                  "        \"permission_level\": { \"type\": \"string\" }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "const validate = ajv.compile(schema);\r",
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Schema is valid', function () {\r",
+                  "    const valid = validate(response);\r",
+                  "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+                  "});\r",
+                  "*/\r",
+                  "\r",
+                  "// Delete the created list\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\")\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"list_id\");\r",
+                  "\r",
+                  "var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({\r",
+                  "            name: \"tst_\" + rndNum\r",
+                  "        })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "\r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "\r",
+                  "    var body = response.json();\r",
+                  "\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "    \r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "      \r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "\r",
+                  "*/\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{app_url}}/list/{{list_id}}",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "list",
+                "{{list_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Update List",
+      "item": [
+        {
+          "name": "Update a list name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "var body = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"List contains the same ID\", function () {\r",
+                  "    pm.expect(body.id).to.eql(pm.collectionVariables.get(\"list_id\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"List contains the updated name\", function () {\r",
+                  "    pm.expect(body.name).to.eql(pm.collectionVariables.get(\"list_name_upd\"));\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Check schema\r",
+                  "\r",
+                  "const Ajv = require('ajv');\r",
+                  "const ajv = new Ajv();\r",
+                  "\r",
+                  "var schema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"id\", \"name\", \"deleted\", \"orderindex\", \"content\", \"task_count\", \"archived\", \"override_statuses\", \"statuses\", \"permission_level\", \"folder\", \"space\", \"inbound_address\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"id\": { \"type\": \"string\" },\r",
+                  "        \"name\": { \"type\": \"string\" },\r",
+                  "        \"deleted\": { \"type\": \"boolean\" },\r",
+                  "        \"orderindex\": { \"type\": \"number\" },\r",
+                  "        \"content\": { \"type\": \"string\" },\r",
+                  "        \"priority\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"assignee\": { \"type\": [\"string\", \"object\", \"null\"] },\r",
+                  "        \"task_count\": { \"type\": \"number\" },\r",
+                  "        \"due_date\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"start_date\": { \"type\": [\"string\", \"null\"] },\r",
+                  "        \"folder\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"hidden\", \"archived\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"hidden\": { \"type\": \"boolean\" },\r",
+                  "                \"archived\": { \"type\": \"boolean\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"space\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"id\", \"name\", \"archived\", \"access\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"id\": { \"type\": \"string\" },\r",
+                  "                \"name\": { \"type\": \"string\" },\r",
+                  "                \"archived\": { \"type\": \"boolean\" },\r",
+                  "                \"access\": { \"type\": \"boolean\" }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"inbound_address\": { \"type\": \"string\" },\r",
+                  "        \"archived\": { \"type\": \"boolean\" },\r",
+                  "        \"override_statuses\": { \"type\": \"boolean\" },\r",
+                  "        \"statuses\": {\r",
+                  "            \"type\": \"array\",\r",
+                  "            \"items\": {\r",
+                  "                \"type\": \"object\",\r",
+                  "                \"required\": [\"id\", \"status\", \"orderindex\", \"color\", \"type\", \"status_group\"],\r",
+                  "                \"properties\": {\r",
+                  "                    \"id\": { \"type\": \"string\" },\r",
+                  "                    \"status\": { \"type\": \"string\" },\r",
+                  "                    \"orderindex\": { \"type\": \"number\" },\r",
+                  "                    \"color\": { \"type\": \"string\" },\r",
+                  "                    \"type\": { \"type\": \"string\" },\r",
+                  "                    \"status_group\": { \"type\": \"string\" }\r",
+                  "                }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        \"permission_level\": { \"type\": \"string\" }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "const validate = ajv.compile(schema);\r",
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Schema is valid', function () {\r",
+                  "    const valid = validate(response);\r",
+                  "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Delete the created list\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id\"),\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\")\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    pm.test(\"Status code of Delete is 200\", function () {\r",
+                  "        pm.expect(response).to.have.status(200);\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"rndNum\");\r",
+                  "pm.collectionVariables.unset(\"rndNum_upd\");\r",
+                  "pm.collectionVariables.unset(\"list_id\");\r",
+                  "\r",
+                  "\r",
+                  "// Create List Name with Random Number for updating\r",
+                  "\r",
+                  "var rndNum_upd = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"list_name_upd\", \"tst_\" + rndNum_upd);\r",
+                  "\r",
+                  "// Create List\r",
+                  "\r",
+                  "var rndNum = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({\r",
+                  "            name: \"tst_\" + rndNum\r",
+                  "        })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "\r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "\r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    console.log(\"Status code of List creation is \", response.code);\r",
+                  "\r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id\", body.id);\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"{{list_name_upd}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{app_url}}/list/{{list_id}}",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "list",
+                "{{list_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a list name to some not unique one",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "var body = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"List name is taken\", function () {\r",
+                  "    pm.expect(body.err).to.eql(\"List name taken\");\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Delete the created 2 lists\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id1\"),\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "\r",
+                  "});\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id2\"),\r",
+                  "    method: \"DELETE\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\")\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "   \r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id1\"),\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\")\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "\r",
+                  "\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/list/\" + pm.collectionVariables.get(\"list_id2\"),\r",
+                  "        method: \"DELETE\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\")\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "\r",
+                  "*/\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// pm.collectionVariables.get(\"list_name_n4\");\r",
+                  "\r",
+                  "pm.collectionVariables.unset(\"rndNum1\");\r",
+                  "pm.collectionVariables.unset(\"rndNum2\");\r",
+                  "pm.collectionVariables.unset(\"list_id1\");\r",
+                  "pm.collectionVariables.unset(\"list_id2\");\r",
+                  "pm.collectionVariables.unset(\"list_name1\");\r",
+                  "pm.collectionVariables.unset(\"list_name2\");\r",
+                  "\r",
+                  "\r",
+                  "// Create 2 Lists\r",
+                  "\r",
+                  "var rndNum1 = Math.floor(Math.random() * 1000000);\r",
+                  "var rndNum2 = Math.floor(Math.random() * 1000000);\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({ \r",
+                  "            name: \"tst_\" + rndNum1 \r",
+                  "            })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id1\", body.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.sendRequest({\r",
+                  "    url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "    method: \"POST\",\r",
+                  "    header: {\r",
+                  "        \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "        \"Content-Type\": \"application/json\",\r",
+                  "        \"accept\": \"application/json\"\r",
+                  "    },\r",
+                  "    body: {\r",
+                  "        mode: \"raw\",\r",
+                  "        raw: JSON.stringify({ \r",
+                  "            name: \"tst_\" + rndNum2 \r",
+                  "            })\r",
+                  "    }\r",
+                  "}, function (err, response) {\r",
+                  "    if (err) {\r",
+                  "        console.error(err);\r",
+                  "        return;\r",
+                  "    }\r",
+                  "    \r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id2\", body.id);\r",
+                  "    pm.collectionVariables.set(\"list_name2\", body.name);\r",
+                  "});\r",
+                  "\r",
+                  "/*\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum1\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id1\", body.id);\r",
+                  "    \r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "\r",
+                  "try {\r",
+                  "    const response = await pm.sendRequest({\r",
+                  "        url: pm.environment.get(\"app_url\") + \"/folder/\" + pm.environment.get(\"folder_id\") + \"/list\",\r",
+                  "        method: \"POST\",\r",
+                  "        header: {\r",
+                  "            \"Authorization\": pm.environment.get(\"token\"),\r",
+                  "            \"Content-Type\": \"application/json\",\r",
+                  "            \"accept\": \"application/json\"\r",
+                  "        },\r",
+                  "        body: {\r",
+                  "            mode: \"raw\",\r",
+                  "            raw: JSON.stringify({\r",
+                  "                name: \"tst_\" + rndNum2\r",
+                  "            })\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    var body = response.json();\r",
+                  "    pm.collectionVariables.set(\"list_id2\", body.id);\r",
+                  "    pm.collectionVariables.set(\"list_name2\", body.name);\r",
+                  "\r",
+                  "} catch (err) {\r",
+                  "    console.error(err);\r",
+                  "}\r",
+                  "*/"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              },
+              {
+                "key": "accept",
+                "value": "application/json"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"{{list_name2}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{app_url}}/list/{{list_id1}}",
+              "host": [
+                "{{app_url}}"
+              ],
+              "path": [
+                "list",
+                "{{list_id1}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "list_id1",
+      "value": ""
+    },
+    {
+      "key": "list_name_non_uniq",
+      "value": ""
+    },
+    {
+      "key": "list_id2",
+      "value": ""
+    },
+    {
+      "key": "i",
+      "value": ""
+    },
+    {
+      "key": "list_name_upd",
+      "value": ""
+    },
+    {
+      "key": "list_name2",
+      "value": ""
+    },
+    {
+      "key": "list_id",
+      "value": ""
+    }
+  ]
+}
