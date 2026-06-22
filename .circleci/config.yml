@@ -1,40 +1,78 @@
 version: 2.1
 
 jobs:
-  run-postman-tests:
+  run-postman-html-tests:
     docker:
-      # Используем официальный Docker-образ Newman на базе Alpine Linux (работает очень быстро)
-      - image: postman/newman:6.1.3-alpine
+      # Используем стабильную Node.js версию для установки Newman и плагинов
+      - image: cimg/node:20.11.0
 
     steps:
-      # Клонируем репозиторий с вашими JSON-файлами
       - checkout
 
-      # Создаем папку для отчетов, чтобы CircleCI мог их проанализировать
+      # Шаг 1: Установка Newman и плагина htmlextra глобально
       - run:
-          name: Create directory for test results
-          command: mkdir -p test-results/newman
+          name: Install Newman and HTMLextra reporter
+          command: |
+            sudo npm install -g newman newman-reporter-htmlextra
 
-      # Запускаем тесты Postman с генерацией консольного и JUnit (XML) отчетов
-      # Кавычки обязательны, так как в названиях файлов есть пробелы
+      # Шаг 2: Создание папки для сохранения HTML-отчёта
       - run:
-          name: Run Postman Collection via Newman
+          name: Create directory for HTML report
+          command: mkdir -p test-results/html
+
+      # Шаг 3: Запуск тестов с флагами cli (для консоли) и htmlextra
+      - run:
+          name: Run Postman Collection and generate HTML report
           command: |
             newman run Collection_for_Lesson5_newman.postman_collection.json \
             -e "ClickUp Environment.postman_environment.json" \
-            --reporters cli,junit \
-            --reporter-junit-export test-results/newman/results.xml
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export test-results/html/report.html \
+            --reporter-htmlextra-title "ClickUp API Test Report"
 
-      # Сохраняем результаты тестов, чтобы они красиво отображались во вкладке "Tests" в CircleCI
-      - store_test_results:
-          path: test-results
-
-      # Сохраняем XML-отчет в артефакты (можно будет скачать при необходимости)
+      # Шаг 4: Сохранение HTML-отчёта в артефакты CircleCI
       - store_artifacts:
-          path: test-results
-          destination: PostmanReports
+          path: test-results/html
+          destination: HTML-Dashboard
 
-workflows:
-  api-testing-workflow:
-    jobs:
-      - run-postman-tests
+
+# version: 2.1
+
+# jobs:
+#   run-postman-tests:
+#     docker:
+#       # Используем официальный Docker-образ Newman на базе Alpine Linux (работает очень быстро)
+#       - image: postman/newman:6.1.3-alpine
+
+#     steps:
+#       # Клонируем репозиторий с вашими JSON-файлами
+#       - checkout
+
+#       # Создаем папку для отчетов, чтобы CircleCI мог их проанализировать
+#       - run:
+#           name: Create directory for test results
+#           command: mkdir -p test-results/newman
+
+#       # Запускаем тесты Postman с генерацией консольного и JUnit (XML) отчетов
+#       # Кавычки обязательны, так как в названиях файлов есть пробелы
+#       - run:
+#           name: Run Postman Collection via Newman
+#           command: |
+#             newman run Collection_for_Lesson5_newman.postman_collection.json \
+#             -e "ClickUp Environment.postman_environment.json" \
+#             --reporters cli,junit \
+#             --reporter-junit-export test-results/newman/results.xml
+
+#       # Сохраняем результаты тестов, чтобы они красиво отображались во вкладке "Tests" в CircleCI
+#       - store_test_results:
+#           path: test-results
+
+#       # Сохраняем XML-отчет в артефакты (можно будет скачать при необходимости)
+#       - store_artifacts:
+#           path: test-results
+#           destination: PostmanReports
+
+# workflows:
+#   api-testing-workflow:
+#     jobs:
+#       - run-postman-tests
