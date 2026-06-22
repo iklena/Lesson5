@@ -35,7 +35,11 @@ jobs:
           path: test-results/html
           destination: HTML-Dashboard
 
-
+workflows:
+  api-testing-workflow:
+    jobs:
+      - run-postman-html-tests
+      
 # version: 2.1
 
 # jobs:
