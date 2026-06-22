@@ -1,43 +1,40 @@
 version: 2.1
 
 jobs:
-  node-job:
+  run-postman-tests:
     docker:
-      - image: node-24.16.0-chrome-149.0.7827.102-1-ff-151.0.4-edge-149.0.4022.52-1
+      # Используем официальный Docker-образ Newman на базе Alpine Linux (работает очень быстро)
+      - image: postman/newman:6.1.3-alpine
 
     steps:
+      # Клонируем репозиторий с вашими JSON-файлами
       - checkout
 
+      # Создаем папку для отчетов, чтобы CircleCI мог их проанализировать
       - run:
-          name: Install dependencies
+          name: Create directory for test results
+          command: mkdir -p test-results/newman
+
+      # Запускаем тесты Postman с генерацией консольного и JUnit (XML) отчетов
+      # Кавычки обязательны, так как в названиях файлов есть пробелы
+      - run:
+          name: Run Postman Collection via Newman
           command: |
-            sudo apt-get update
-            sudo apt-get install -y unzip
+            newman run Collection_for_Lesson5_newman.postman_collection.json \
+            -e "ClickUp Environment.postman_environment.json" \
+            --reporters cli,junit \
+            --reporter-junit-export test-results/newman/results.xml
 
-      - run:
-          name: Install npm packages
-          command: npm ci
+      # Сохраняем результаты тестов, чтобы они красиво отображались во вкладке "Tests" в CircleCI
+      - store_test_results:
+          path: test-results
 
-      - run:
-          name: Install Allure
-          command: |
-            curl -sSL https://github.com/allure-framework/allure2/releases/download/2.19.0/allure-2.19.0.zip -o allure.zip
-            sudo unzip allure.zip -d /opt/allure
-            sudo ln -s /opt/allure/allure-2.19.0/bin/allure /usr/bin/allure
-
-      - run:
-          name: Run tests
-          command: npx cypress run
-
-      - run:
-          name: Generate report
-          command: npm run allure:report
-
+      # Сохраняем XML-отчет в артефакты (можно будет скачать при необходимости)
       - store_artifacts:
-          path: allure-report
-          destination: CypressReport
+          path: test-results
+          destination: PostmanReports
 
 workflows:
-  build-and-test:
+  api-testing-workflow:
     jobs:
-      - node-job
+      - run-postman-tests
